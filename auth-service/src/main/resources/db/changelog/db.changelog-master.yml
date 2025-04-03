@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/create-users-table.sql
+  - include:
+      file: db/changelog/changeset/create-roles-table.sql
+  - include:
+      file: db/changelog/changeset/create-user_roles-table.sql
+  - include:
+      file: db/changelog/changeset/create-refresh_tokens-table.sql
