@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: auth-service
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yml
+    enabled: true
+  datasource:
+    username: postgres
+    password: 1234
+    url: jdbc:postgresql://localhost:5432/chatdb
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show_sql: true
+    properties:
+      hibernate:
