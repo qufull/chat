@@ -2,6 +2,7 @@ package com.example.auth_service.service;
 
 import com.example.auth_service.model.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.lang.Function;
@@ -45,6 +46,8 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
     }
+
+
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())

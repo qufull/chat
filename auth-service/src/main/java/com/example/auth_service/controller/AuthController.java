@@ -5,12 +5,15 @@ import com.example.auth_service.dto.auth.RefreshTokenRequest;
 import com.example.auth_service.dto.auth.SignInRequest;
 import com.example.auth_service.dto.auth.SignUpRequest;
 import com.example.auth_service.dto.auth.SignUpResponse;
+import com.example.auth_service.dto.auth.TokenValidationResult;
 import com.example.auth_service.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,5 +35,11 @@ public class AuthController {
     @PostMapping("/refreshToken")
     public JwtAuthenticationResponse refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
         return authenticationService.refreshToken(request);
+    }
+
+    @PostMapping("/validate")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public TokenValidationResult validate( @RequestBody @Valid String token) {
+        return authenticationService.validateToken(token);
     }
 }

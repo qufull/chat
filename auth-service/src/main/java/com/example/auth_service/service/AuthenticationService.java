@@ -5,8 +5,10 @@ import com.example.auth_service.dto.auth.RefreshTokenRequest;
 import com.example.auth_service.dto.auth.SignInRequest;
 import com.example.auth_service.dto.auth.SignUpRequest;
 import com.example.auth_service.dto.auth.SignUpResponse;
+import com.example.auth_service.dto.auth.TokenValidationResult;
 import com.example.auth_service.exception.EntityNotFoundException;
 import com.example.auth_service.model.RefreshToken;
+import com.example.auth_service.model.Role;
 import com.example.auth_service.model.User;
 import com.example.auth_service.model.enums.RoleEnum;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +16,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,4 +86,30 @@ public class AuthenticationService {
                 }).orElseThrow(() -> new EntityNotFoundException("refresh token not found..!!", HttpStatus.NOT_FOUND));
 
     }
+
+    public TokenValidationResult validateToken(String token) {
+        try{
+            String username = jwtService.extractUserName(token);
+            User user = userService.loadUserByUsername(username);
+            if(jwtService.isTokenValid(token, user)) {
+                return TokenValidationResult.builder()
+                        .isValid(true)
+                        .username(user.getUsername())
+                        .userId(user.getId())
+                        .roles(user.getRoles().stream().map(Role::getName).map(RoleEnum::name).toList())
+                        .build();
+            }else {
+                return TokenValidationResult.builder()
+                        .isValid(false)
+                        .errorMessage("Token is invalid or expired")
+                        .build();
+            }
+        }catch (Exception e) {
+            return TokenValidationResult.builder()
+                    .isValid(false)
+                    .errorMessage("Token validation failed: " + e.getMessage())
+                    .build();
+        }
+    }
 }
+
