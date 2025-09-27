@@ -1,18 +1,10 @@
 package com.example.auth_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import javax.print.attribute.standard.MediaSize;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -31,13 +23,17 @@ public class RefreshToken {
     @UuidGenerator
     private UUID id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
 
-    private String token;
+    @Column(name = "access_token")
+    private String accessToken;
 
-    private Timestamp expiresAt;
+    @Column(name = "refresh_token")
+    private String refreshToken;
 
-    private Timestamp createdAt;
+    @Column(name = "is_logged_out")
+    private boolean loggedOut;
+
 }

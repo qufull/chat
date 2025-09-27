@@ -1,6 +1,6 @@
 spring:
   application:
-    name: auth-service
+    name: user-service
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yml
     enabled: true
@@ -13,3 +13,9 @@ spring:
     show_sql: true
     properties:
       hibernate:
+server:
+  port: 0
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

@@ -6,40 +6,70 @@ import com.example.auth_service.dto.auth.SignInRequest;
 import com.example.auth_service.dto.auth.SignUpRequest;
 import com.example.auth_service.dto.auth.SignUpResponse;
 import com.example.auth_service.dto.auth.TokenValidationResult;
-import com.example.auth_service.service.AuthenticationService;
+import com.example.auth_service.model.User;
+import com.example.auth_service.service.LoginService;
+import com.example.auth_service.service.RefreshTokenService;
+import com.example.auth_service.service.RegisterService;
+import com.example.auth_service.util.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthenticationService authenticationService;
+    private final RegisterService registerService;
+    private final LoginService loginService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/sign-up")
     public SignUpResponse signUp(@RequestBody @Valid SignUpRequest request) {
-        return authenticationService.signUp(request);
+        return registerService.signUp(request);
     }
 
     @PostMapping("/sign-in")
-    public JwtAuthenticationResponse signIn(@RequestBody @Valid SignInRequest request) {
-        return authenticationService.signIn(request);
+    public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest request, HttpServletResponse response) {
+        JwtAuthenticationResponse authResponse = loginService.signIn(request);
+
+        CookieUtil.setAuthCookies(response,authResponse);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refreshToken")
-    public JwtAuthenticationResponse refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
-        return authenticationService.refreshToken(request);
+    public ResponseEntity<JwtAuthenticationResponse> refreshToken(
+            @CookieValue("refresh_token") String token,
+            HttpServletResponse response) {
+
+        ResponseEntity<JwtAuthenticationResponse> responseEntity = refreshTokenService.refreshToken(token);
+        JwtAuthenticationResponse authResponse = responseEntity.getBody();
+
+        if (authResponse == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+       CookieUtil.setAuthCookies(response,authResponse);
+
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/validate")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public TokenValidationResult validate( @RequestBody @Valid String token) {
-        return authenticationService.validateToken(token);
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@AuthenticationPrincipal User user){
+        return ResponseEntity.ok(Map.of(
+                "username", user.getUsername()
+        ));
     }
+
 }

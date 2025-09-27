@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService{
 
     private final UserRepository userRepository;
 
@@ -33,16 +33,5 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Email already exists");
         }
         return userRepository.save(user);
-    }
-
-    public User getCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return loadUserByUsername(username);
-    }
-
-    @Override
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Username not found"));
     }
 }

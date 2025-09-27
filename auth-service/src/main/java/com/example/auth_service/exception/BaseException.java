@@ -1,7 +1,9 @@
 package com.example.auth_service.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public abstract class BaseException extends RuntimeException {
     private final HttpStatus httpStatus;
 
@@ -10,7 +12,4 @@ public abstract class BaseException extends RuntimeException {
         this.httpStatus = httpStatus;
     }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
 }
