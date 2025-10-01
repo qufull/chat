@@ -1,5 +1,6 @@
 package com.example.user_service.model;
 
+import com.example.user_service.model.enums.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -17,8 +18,7 @@ import java.util.UUID;
 public class UserProfile {
 
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+    private String id;
 
     @Column(name = "nickname", nullable = false, unique = true, length = 50)
     private String nickname;
@@ -27,7 +27,7 @@ public class UserProfile {
     private String avatarUrl;
 
     @Column(name = "status", length = 50)
-    private String status; // "online / offline / custom"
+    private ProfileStatus status; // "online / offline / custom"
 
     @Column(name = "about", columnDefinition = "TEXT")
     private String about;

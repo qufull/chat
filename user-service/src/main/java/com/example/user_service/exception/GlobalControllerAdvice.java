@@ -1,6 +1,7 @@
-package com.example.auth_service.exception;
+package com.example.user_service.exception;
 
-import com.example.auth_service.dto.exception.ErrorResponse;
+import com.example.user_service.dto.exception.ErrorResponse;
+import com.example.user_service.exception.BaseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -1,8 +1,8 @@
 CREATE TABLE user_profiles (
-                          user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                          id VARCHAR(128) UNIQUE NOT NULL,
                           nickname VARCHAR(30),
                           avatar_url VARCHAR(512),
-                          status VARCHAR(20) DEFAULT 'online' CHECK (status IN ('online', 'offline', 'idle', 'dnd')),
-                          last_online TIMESTAMP WITH TIME ZONE,
-                          bio TEXT
+                          status VARCHAR(20) DEFAULT 'ONLINE' CHECK (status IN ('ONLINE', 'OFFLINE')),
+                          last_seen TIMESTAMP WITH TIME ZONE,
+                          about TEXT
 );

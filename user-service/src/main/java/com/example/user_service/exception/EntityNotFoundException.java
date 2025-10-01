@@ -1,5 +1,6 @@
-package com.example.auth_service.exception;
+package com.example.user_service.exception;
 
+import com.example.user_service.exception.BaseException;
 import org.springframework.http.HttpStatus;
 
 public class EntityNotFoundException extends BaseException {
