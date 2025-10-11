@@ -1,0 +1,4 @@
+POST http://localhost:9090/realms/chat/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=chatclient&client_secret=vx2C1sgWJnd17ywYMUTVUx2kvsztB2TJ&username=qufull&password=1234&grant_type=password

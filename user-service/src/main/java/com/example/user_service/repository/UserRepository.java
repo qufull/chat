@@ -13,6 +13,6 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<UserProfile, UUID> {
 
-    @NativeQuery("select p.nickname, p.avatar_url, p.status, p.last_online, p.last_online FROM user_profiles p JOIN users ON p.user_id = users.id")
-    Optional<UserProfile> findUserProfilesById(UUID id);
+    @NativeQuery("SELECT * FROM user_profiles WHERE id = ?")
+    Optional<UserProfile> findUserProfilesById(String id);
 }

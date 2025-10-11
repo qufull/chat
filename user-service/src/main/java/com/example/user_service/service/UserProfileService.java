@@ -16,23 +16,5 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
 
-    public ProfileRequest showProfile(UUID id){
-        UserProfile userProfile = userRepository.findUserProfilesById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
-
-        return userProfile.getStatus() == ProfileStatus.ONLINE ?
-                ProfileRequest.builder()
-                .nickname(userProfile.getNickname())
-                .avatarUrl(userProfile.getAvatarUrl())
-                .status(userProfile.getStatus())
-                .about(userProfile.getAbout())
-                .build()
-                : ProfileRequest.builder()
-                .nickname(userProfile.getNickname())
-                .avatarUrl(userProfile.getAvatarUrl())
-                .about(userProfile.getAbout())
-                .lastSeen(userProfile.getLastSeen())
-                .build();
-    }
 
 }
