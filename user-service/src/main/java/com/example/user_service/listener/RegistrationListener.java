@@ -15,7 +15,7 @@ public class RegistrationListener {
     private final UserRepository userRepository;
     private final ObjectMapper mapper;
 
-    @KafkaListener(topics = "keycloak-events", groupId = "user-service")
+    @KafkaListener(topics = "user.created", groupId = "user-service")
     public void onUserRegistered(String message) throws Exception {
         JsonNode event = mapper.readTree(message);
         if (!"REGISTER".equals(event.path("type").asText())) return;
