@@ -1,47 +1,49 @@
 package com.example.authenticationservice.service;
 
+import com.example.authenticationservice.dto.SessionData;
+import com.example.authenticationservice.mapper.JsonConverter;
 import com.example.authenticationservice.store.RefreshTokenStore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class SessionService {
     private final RefreshTokenStore store;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonConverter mapper;
+    Set<RefreshService> a = new HashSet<>();
 
-    public void saveSession(String sid, String userId, String refreshToken) {
-        try {
-            String data = mapper.writeValueAsString(Map.of(
-                    "userId", userId,
-                    "refreshToken", refreshToken,
-                    "createdAt", System.currentTimeMillis()
-            ));
-            store.save(sid, data);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+
+
+
+
+    public void saveSession(SessionData session) {
+        store.save(session);
+
     }
 
-    public String getRefresh(String sid) {
-        return store.get(sid)
-                .map(json -> {
-                    try {
-                        Map<String, Object> map = mapper.readValue(json, Map.class);
-                        return (String) map.get("refreshToken");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+    public String getRefresh(String userId,String deviceId) {
+        return getSession(userId,deviceId)
+                .map(SessionData::getRefreshToken)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No session"));
     }
 
     public void deleteSession(String sid) {
-        store.delete(sid);
+        store.deleteSession(sid);
+    }
+
+    public void deleteAllForUser(String userId) {
+        store.deleteAllForUser(userId);
+    }
+
+    private Optional<SessionData> getSession(String userId,String deviceId) {
+        return store.findByUserAndDevice(userId,deviceId);
     }
 }

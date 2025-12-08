@@ -25,8 +25,8 @@ public class RegisterService {
 
     public String createUser(RegisterRequest registerRequest) {
         UserRepresentation user = new UserRepresentation();
-        user.setUsername(registerRequest.username());
-        user.setEmail(registerRequest.email());
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
         user.setEmailVerified(true);
         user.setEnabled(true);
         user.setRequiredActions(Collections.emptyList());
@@ -38,21 +38,21 @@ public class RegisterService {
             if (resp.getStatus() == 409) {
                 if (body != null) {
                     if (body.contains("email")) {
-                        throw new UserAlreadyExistsException(registerRequest.email());
+                        throw new UserAlreadyExistsException(registerRequest.getEmail());
                     } else if (body.contains("username")) {
-                        throw new UsernameAlreadyExistsException(registerRequest.username());
+                        throw new UsernameAlreadyExistsException(registerRequest.getUsername());
                     }
                 }
-                throw new UserAlreadyExistsException(registerRequest.username());
+                throw new UserAlreadyExistsException(registerRequest.getUsername());
             }
 
             throw new KeycloakRequestException("Keycloak create user failed: " + resp.getStatus() + " | " + body);
         }
 
         String userId = CreatedResponseUtil.getCreatedId(resp);
-        setUserPassword(userId,registerRequest.password(),false);
+        setUserPassword(userId,registerRequest.getPassword(),false);
 
-        producer.publishUserCreated(userId, registerRequest.email(),registerRequest.username());
+        producer.publishUserCreated(userId, registerRequest.getEmail(),registerRequest.getUsername());
         return userId;
     }
 

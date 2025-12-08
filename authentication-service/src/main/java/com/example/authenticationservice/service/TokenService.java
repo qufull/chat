@@ -1,7 +1,9 @@
 package com.example.authenticationservice.service;
 
+import com.example.authenticationservice.dto.OidcTokenResponse;
 import com.example.authenticationservice.exception.loginException.InvalidCredentialsException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -16,13 +18,14 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TokenService {
     private final WebClient keycloakWebClient;
     private final String keycloakRealm;
     private final String keycloakClientId;
     private final String keycloakClientSecret;
 
-    public Map<String, Object> passwordGrant(String username, String password) {
+    public OidcTokenResponse passwordGrant(String username, String password) {
         return tokenRequest(Map.of(
                 "grant_type", "password",
                 "username", username,
@@ -32,7 +35,7 @@ public class TokenService {
         ));
     }
 
-    public Map<String, Object> refreshGrant(String refreshToken) {
+    public OidcTokenResponse refreshGrant(String refreshToken) {
         return tokenRequest(Map.of(
                 "grant_type", "refresh_token",
                 "refresh_token", refreshToken,
@@ -41,7 +44,21 @@ public class TokenService {
         ));
     }
 
-    private Map<String, Object> tokenRequest(Map<String, String> form) {
+    public void logout(String refreshToken) {
+        String url = String.format("/realms/%s/protocol/openid-connect/logout", keycloakRealm);
+
+        keycloakWebClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("client_id=" + keycloakClientId +
+                        "&client_secret=" + keycloakClientSecret+
+                        "&refresh_token=" + refreshToken)
+                .retrieve()
+                .toBodilessEntity()
+                .block();
+    }
+
+    private OidcTokenResponse tokenRequest(Map<String, String> form) {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         form.forEach(body::add);
 
@@ -50,9 +67,10 @@ public class TokenService {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData(body))
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, r -> r.bodyToMono(String.class)
-                        .flatMap(msg -> Mono.error(new InvalidCredentialsException())))
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .onStatus(HttpStatusCode::isError, r ->
+                        r.bodyToMono(String.class)
+                                .flatMap(msg -> Mono.error(new InvalidCredentialsException())))
+                .bodyToMono(OidcTokenResponse.class)
                 .block();
     }
     }

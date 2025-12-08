@@ -1,19 +1,18 @@
 package com.example.authenticationservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
-public class TokenResponse {
-    private String accessToken;
+public class SessionData {
+    private String sessionId;
     private String userId;
-    private String sid;
+    private String refreshToken;
     private String deviceId;
-    private String deviceSecret;
 }

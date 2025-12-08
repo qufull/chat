@@ -14,6 +14,8 @@ public class AppException extends RuntimeException{
         this.status = status;
     }
 
+    NullPointerException
+
 }
 
 
