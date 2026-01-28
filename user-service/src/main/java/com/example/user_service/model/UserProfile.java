@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -18,23 +19,29 @@ import java.util.UUID;
 public class UserProfile {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
 
-    @Column(name = "nickname", nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
     private String nickname;
 
-    @Column(name = "avatar_url")
+    @Column(nullable = false)
     private String avatarUrl;
 
-    @Column(name = "status", length = 50)
-    private ProfileStatus status; // "online / offline / custom"
 
-    @Column(name = "about", columnDefinition = "TEXT")
-    private String about;
+    private String bio;
 
-    @Column(name = "last_seen")
-    private Instant lastSeen;
+    private ProfileStatus status;
+    private LocalDateTime lastSeenAt;
+    private boolean isActive;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private int version;
 }
 
 
